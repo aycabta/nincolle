@@ -28,6 +28,7 @@ File.open(ARGV[0], "r") do |f|
       else
         filename = "#{object_id}.#{ext}"
       end
+      puts filename
       File.open(filename, "w") do |f|
         f.write(Base64.decode64(element.elements["data"].elements["data"].text))
       end
