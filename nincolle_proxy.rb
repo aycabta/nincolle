@@ -16,7 +16,7 @@ end
 
 $fuck_count = 0
 
-$define_tags_for_replacement = [
+$DEFINE_TAGS_FOR_REPLACEMENT = [
   "DefineBits",
   "DefineSound",
   "DefineBitsLossless",
@@ -31,14 +31,14 @@ def replace_data(xmldoc, id, new_data)
     export = REXML::XPath.first(xmldoc, "//Export/symbols/Symbol[@name=\"#{id}\"]")
     object_id = export.attributes["objectID"]
     REXML::XPath.each(export.parent, "//*[@objectID=\"#{object_id}\"]") do |element|
-      if $define_tags_for_replacement.include?(element.name)
+      if $DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
         element.elements["data"].elements["data"].text = Base64.strict_encode64(new_data)
         break
       end
     end
   elsif id.kind_of?(Fixnum)
     REXML::XPath.each(xmldoc, "//*[@objectID=\"#{id}\"]") do |element|
-      if $define_tags_for_replacement.include?(element.name)
+      if $DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
         element.elements["data"].elements["data"].text = Base64.strict_encode64(new_data)
         break
       end
