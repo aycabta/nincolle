@@ -10,7 +10,8 @@ require 'rexml/document'
 module WEBrick
   class HTTPRequest
     # for long URL
-    MAX_URI_LENGTH = MAX_URI_LENGTH = 208300
+    remove_const(:MAX_URI_LENGTH)
+    MAX_URI_LENGTH = 208300
   end
 end
 
