@@ -91,7 +91,7 @@ def replace_swf_datas(orig_swf_data, replace_pairs)
   f.close
 
   raw_xml_data = mill_swf2xml_to_raw(filename)
-  if xml.nil?
+  if raw_xml_data.nil?
     return nil
   end
   xmldoc = REXML::Document.new(raw_xml_data)
