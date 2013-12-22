@@ -4,7 +4,7 @@ require 'uri'
 class Filling
   def self.get_raw_data(name)
     if name =~ /^https?:\/\//
-      uri= URI.parse(name)
+      uri = URI.parse(name)
       res = Net::HTTP.get_response(uri)
       if res.nil?
         nil

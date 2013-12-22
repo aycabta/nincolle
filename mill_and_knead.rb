@@ -10,6 +10,9 @@ class MillAndKnead
     raw_xml_data = mill_swf2xml_to_raw(orig_raw_swf)
     if not raw_xml_data.nil?
       @xmldoc = REXML::Document.new(raw_xml_data)
+      if @xmldoc.nil?
+        puts "#{@filename}.xml is not valid"
+      end
     end
   end
 
@@ -58,8 +61,10 @@ class MillAndKnead
   end
 
   def replace_swf_data(replace_pairs)
-    replace_pairs.each do |orig_id, dest|
-      replace_data(orig_id, Filling.get_raw_data(dest))
+    if not @xmldoc.nil?
+      replace_pairs.each do |orig_id, dest|
+        replace_data(orig_id, Filling.get_raw_data(dest))
+      end
     end
   end
 
@@ -80,15 +85,19 @@ class MillAndKnead
   end
 
   def get_raw_swf
-    f = File.open("#{Dir.tmpdir}/#{@filename}.xml", "w")
-    if f.nil?
-      puts "#{@filename}.xml open error"
-      return nil
-    end
-    f.write(@xmldoc.to_s)
-    f.close
+    if @xmldoc.nil?
+      nil
+    else
+      f = File.open("#{Dir.tmpdir}/#{@filename}.xml", "w")
+      if f.nil?
+        puts "#{@filename}.xml open error"
+        return nil
+      end
+      f.write(@xmldoc.to_s)
+      f.close
 
-    mill_xml2swf_to_raw
+      mill_xml2swf_to_raw
+    end
   end
 end
 
