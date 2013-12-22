@@ -40,7 +40,10 @@ handler = proc { |req, res|
         puts "replacement: #{replacement.to_s}"
         mk = MillAndKnead.new(res.body)
         mk.replace_swf_data(replacement)
-        res.body = mk.get_raw_swf
+        raw_swf = mk.get_raw_swf
+        if not raw_swf.nil?
+          res.body = raw_swf
+        end
       end
     end
   end
