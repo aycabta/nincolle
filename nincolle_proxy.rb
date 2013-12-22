@@ -34,7 +34,7 @@ handler = proc { |req, res|
   if not config["swf"].nil?
     config["swf"].each do |swf_name, replacement|
       regexp_escaped = swf_name.gsub(/(\/|\.)/, '\\\\\1')
-      if req.request_uri.to_s =~ /^http:\/\/125\.6\.187\.229\/kcs\/#{regexp_escaped}\?(version|VERSION)=(\d+\.?)+/
+      if req.request_uri.to_s =~ /^http:\/\/[0-9.]+\/kcs\/#{regexp_escaped}\?(version|VERSION)=(\d+\.?)+/
         puts "url: #{req.request_uri.to_s}"
         puts "detect for: #{swf_name}"
         puts "replacement: #{replacement.to_s}"
