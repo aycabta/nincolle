@@ -3,3 +3,8 @@
 config.yml
 Gemfile.lock
 replacement/*
+
+*.swf
+*.xml
+*.swp
+
