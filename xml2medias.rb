@@ -1,5 +1,7 @@
 require 'base64'
 require 'rexml/document'
+require 'bundler'
+Bundler.require
 
 if ARGV.size < 1
   puts "usage: ruby xml2medias.rb converted_from_swf.xml"

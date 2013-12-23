@@ -1,5 +1,7 @@
 require 'tmpdir'
 require './filling'
+require 'bundler'
+Bundler.require
 
 class MillAndKnead
   @@fuck_count = 0

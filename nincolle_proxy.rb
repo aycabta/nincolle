@@ -7,6 +7,8 @@ require 'tmpdir'
 require 'yaml'
 require 'rexml/document'
 require './mill_and_knead'
+require 'bundler'
+Bundler.require
 
 module WEBrick
   class HTTPRequest
