@@ -7,6 +7,7 @@ require 'tmpdir'
 require 'yaml'
 require 'rexml/document'
 require './mill_and_knead'
+require './tank'
 require 'bundler'
 Bundler.require
 
@@ -31,6 +32,7 @@ $DEFINE_TAGS_FOR_REPLACEMENT = [
 ]
 
 config = YAML.load_file("config.yml").to_h
+tank = Tank.new
 
 handler = proc { |req, res|
   if not config["swf"].nil?
@@ -40,7 +42,7 @@ handler = proc { |req, res|
         puts "url: #{req.request_uri.to_s}"
         puts "detect for: #{swf_name}"
         puts "replacement: #{replacement.to_s}"
-        mk = MillAndKnead.new(res.body)
+        mk = MillAndKnead.new(res.body, tank)
         mk.replace_swf_data(replacement)
         raw_swf = mk.get_raw_swf
         if not raw_swf.nil?

@@ -1,12 +1,13 @@
 require 'tmpdir'
-require './filling'
+require './tank'
 require 'bundler'
 Bundler.require
 
 class MillAndKnead
   @@fuck_count = 0
 
-  def initialize(orig_raw_swf)
+  def initialize(orig_raw_swf, tank)
+    @tank = tank
     @filename = "nincolle_#{@@fuck_count}"
     @@fuck_count += 1
     raw_xml_data = mill_swf2xml_to_raw(orig_raw_swf)
@@ -65,7 +66,8 @@ class MillAndKnead
   def replace_swf_data(replace_pairs)
     if not @xmldoc.nil?
       replace_pairs.each do |orig_id, dest|
-        replace_data(orig_id, Filling.get_raw_data(dest))
+        replace_data(orig_id, @tank.get_raw_data(dest))
+        @tank.save_list
       end
     end
   end

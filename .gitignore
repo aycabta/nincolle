@@ -3,6 +3,8 @@
 config.yml
 Gemfile.lock
 replacement/*
+cache/*
+cache_list.yml
 
 *.swf
 *.xml
