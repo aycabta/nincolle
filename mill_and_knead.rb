@@ -4,6 +4,16 @@ require 'bundler'
 Bundler.require
 
 class MillAndKnead
+  @@DEFINE_TAGS_FOR_REPLACEMENT = [
+    "DefineBits",
+    "DefineSound",
+    "DefineBitsLossless",
+    "DefineBitsJPEG2",
+    "DefineBitsJPEG3",
+    "DefineBitsLossless2",
+    "DefineBitsJPEG4"
+  ]
+
   @@fuck_count = 0
 
   def initialize(orig_raw_swf, tank)
@@ -48,14 +58,14 @@ class MillAndKnead
       export = REXML::XPath.first(@xmldoc, "//Export/symbols/Symbol[@name=\"#{id}\"]")
       object_id = export.attributes["objectID"]
       REXML::XPath.each(export.parent, "//*[@objectID=\"#{object_id}\"]") do |element|
-        if $DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
+        if @@DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
           element.elements["data"].elements["data"].text = Base64.strict_encode64(new_data)
           break
         end
       end
     elsif id.kind_of?(Fixnum)
       REXML::XPath.each(@xmldoc, "//*[@objectID=\"#{id}\"]") do |element|
-        if $DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
+        if @@DEFINE_TAGS_FOR_REPLACEMENT.include?(element.name)
           element.elements["data"].elements["data"].text = Base64.strict_encode64(new_data)
           break
         end

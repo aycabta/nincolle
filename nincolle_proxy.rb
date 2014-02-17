@@ -19,18 +19,6 @@ module WEBrick
   end
 end
 
-$fuck_count = 0
-
-$DEFINE_TAGS_FOR_REPLACEMENT = [
-  "DefineBits",
-  "DefineSound",
-  "DefineBitsLossless",
-  "DefineBitsJPEG2",
-  "DefineBitsJPEG3",
-  "DefineBitsLossless2",
-  "DefineBitsJPEG4"
-]
-
 config = YAML.load_file("config.yml").to_h
 tank = Tank.new
 
