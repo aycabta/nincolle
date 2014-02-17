@@ -41,8 +41,6 @@ request_callback = proc { |req, res|
         elsif not req['If-Range'].nil?
           if_none_match = req['If-Range']
         end
-        puts req.header
-        puts "#{if_none_match} == #{tank.get_swf_entity_tag(swf_name)} #=> #{if_none_match == tank.get_swf_entity_tag(swf_name)}"
         if (not if_none_match.nil?) and if_none_match == tank.get_swf_entity_tag(swf_name)
           raise WEBrick::HTTPStatus::NotModified
         elsif tank.has_the_same_swf?(swf_name, version, replacement)
