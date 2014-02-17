@@ -1,13 +1,23 @@
 require 'yaml'
+require 'digest/md5'
 
 # "http://hogehoge.hoge/hogehoge.jpg":
 #   filenum: 0
-#   filename: "0.jpg"
+#   filename: "0"
 #   last_modified: YYYY-MM-DD hh:mm:ss
-# "http://kiee.net/pao.jpg":
+# "http://kiee.net/pao.gif":
 #   filenum: 1
-#   filename: "1.jpg"
-#   last_modified: YYYY-MM-DD hh:mm:ss
+#   filename: "1"
+#   etag: "fj9349fg9349J934"
+# "ship/118.swf":
+#   filenum: 2
+#   filename: "2"
+#   version: 1
+#   ninversion: 3
+#   replacement:
+#     1: ...
+#     3: ...
+#     ...
 
 class Tank
   def initialize
