@@ -61,8 +61,11 @@ class Tank
     file_data = @list[url]
     uri = URI.parse(url)
     req = Net::HTTP::Get.new(uri.request_uri)
-    if not file_data.nil?
-      req['If-Modified-Since'] = file_data[:last_modified].strftime('%a, %d %b %Y %T %z') # RFC 2822
+    if not file_data.nil? and not file_data[:last_modified].nil?
+      req['If-Modified-Since'] = file_data[:last_modified].strftime('%a, %d %b %Y %T %z') # RFC 1123
+    end
+    if not file_data.nil? and not file_data[:etag].nil?
+      req['If-None-Match'] = file_data[:etag]
     end
     http = Net::HTTP.new(uri.host, uri.port)
     res = http.request(req)
@@ -70,16 +73,19 @@ class Tank
       puts "error: #{url}"
     elsif res.kind_of?(Net::HTTPSuccess)
       last_modified = DateTime.rfc2822(res['Last-Modified'])
+      etag = res['ETag']
       if file_data.nil?
         @filenum += 1
-        filename = "#{@filenum}.jpg"
+        filename = "#{@filenum}"
         file_data = {
           :filenum => @filenum,
           :filename => filename,
-          :last_modified => last_modified
+          :last_modified => last_modified,
+          :etag => etag
         }
       else
         file_data[:last_modified] = last_modified
+        file_data[:etag] = etag
       end
       open("cache/#{file_data[:filename]}", "w") do |f|
         f.write(res.body)
