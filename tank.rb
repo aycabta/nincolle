@@ -123,5 +123,55 @@ class Tank
       end
     end
   end
+
+  def get_cached_raw_data(name)
+    file_data = @list[name]
+    f = File.open("cache/#{file_data[:filename]}", "r")
+    if f.nil?
+      puts "cache/#{file_data[:filename]} open error"
+      nil
+    else
+      new_media_data = f.read
+      f.close
+      new_media_data
+    end
+  end
+
+  def has_the_same_swf?(name, version, replacement)
+    file_data = @list[name]
+    if file_data.nil?
+      false
+    else
+      if file_data[:version] == version and file_data[:replacement].eql?(replacement)
+        true
+      else
+        false
+      end
+    end
+  end
+
+  def save_raw_swf(name, raw_data, version, replacement)
+    @filenum += 1
+    filename = "#{@filenum}"
+    file_data = {
+      :filenum => @filenum,
+      :filename => filename,
+      :version => version,
+      :replacement => replacement
+    }
+    open("cache/#{file_data[:filename]}", "w") do |f|
+      f.write(raw_data)
+      @list[name] = file_data
+    end
+  end
+
+  def get_swf_entity_tag(name)
+    file_data = @list[name]
+    if file_data.nil?
+      nil
+    else
+      "#{file_data[:version]}-#{Digest::MD5.hexdigest(file_data[:replacement].to_s)}"
+    end
+  end
 end
 

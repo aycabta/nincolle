@@ -22,19 +22,56 @@ end
 config = YAML.load_file("config.yml").to_h
 tank = Tank.new
 
-handler = proc { |req, res|
+def retrieve_swf_version_if_hit(url, swf_name)
+  regexp_escaped = swf_name.gsub(/(\/|\.)/, '\\\\\1')
+  if url =~ /^http:\/\/[0-9.]+\/kcs\/#{regexp_escaped}\?(?:version|VERSION)=((?:\d+\.?)+)/
+    $1
+  else
+    nil
+  end
+end
+
+request_callback = proc { |req, res|
   if not config["swf"].nil?
     config["swf"].each do |swf_name, replacement|
-      regexp_escaped = swf_name.gsub(/(\/|\.)/, '\\\\\1')
-      if req.request_uri.to_s =~ /^http:\/\/[0-9.]+\/kcs\/#{regexp_escaped}\?(version|VERSION)=(\d+\.?)+/
-        puts "url: #{req.request_uri.to_s}"
-        puts "detect for: #{swf_name}"
-        puts "replacement: #{replacement.to_s}"
+      version = retrieve_swf_version_if_hit(req.request_uri.to_s, swf_name)
+      if not version.nil?
+        if not req['If-None-Match'].nil?
+          if_none_match = req['If-None-Match']
+        elsif not req['If-Range'].nil?
+          if_none_match = req['If-Range']
+        end
+        puts req.header
+        puts "#{if_none_match} == #{tank.get_swf_entity_tag(swf_name)} #=> #{if_none_match == tank.get_swf_entity_tag(swf_name)}"
+        if (not if_none_match.nil?) and if_none_match == tank.get_swf_entity_tag(swf_name)
+          raise WEBrick::HTTPStatus::NotModified
+        elsif tank.has_the_same_swf?(swf_name, version, replacement)
+          res.body = tank.get_cached_raw_data(swf_name)
+          res['ETag'] = tank.get_swf_entity_tag(swf_name)
+          res['Expires'] = Time.now.strftime('%a, %d %b %Y %T %z') # RFC 1123
+          raise WEBrick::HTTPStatus::OK
+        end
+      end
+    end
+  end
+}
+
+proxy_content_handler = proc { |req, res|
+  if not config["swf"].nil?
+    config["swf"].each do |swf_name, replacement|
+      version = retrieve_swf_version_if_hit(req.request_uri.to_s, swf_name)
+      if not version.nil?
         mk = MillAndKnead.new(res.body, tank)
         mk.replace_swf_data(replacement)
         raw_swf = mk.get_raw_swf
         if not raw_swf.nil?
+          tank.save_raw_swf(swf_name, raw_swf, version, replacement)
           res.body = raw_swf
+          if not res['Last-Modified'].nil?
+            res.header.delete('Last-Modified')
+          end
+          res['ETag'] = tank.get_swf_entity_tag(swf_name)
+          res['Expires'] = Time.now.strftime('%a, %d %b %Y %T %z') # RFC 1123
         end
       end
     end
@@ -46,7 +83,8 @@ s = WEBrick::HTTPProxyServer.new(
   :Port => 8080,
   :Logger => WEBrick::Log::new($stderr, WEBrick::Log::DEBUG),
   :ProxyVia => true,
-  :ProxyContentHandler => handler
+  :ProxyContentHandler => proxy_content_handler,
+  :RequestCallback => request_callback
 )
 
 Signal.trap('INT') do
