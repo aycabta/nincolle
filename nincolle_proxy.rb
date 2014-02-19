@@ -90,6 +90,7 @@ proxy_content_handler = proc { |req, res|
         raw_swf = mk.get_raw_swf
         if not raw_swf.nil?
           tank.save_raw_swf(swf_name, raw_swf, version, replacement)
+          tank.save_list
           res.body = raw_swf
           if not res['Last-Modified'].nil?
             res.header.delete('Last-Modified')
