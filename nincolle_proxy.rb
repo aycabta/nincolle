@@ -31,6 +31,12 @@ def retrieve_swf_version_if_hit(url, swf_name)
   end
 end
 
+def hit_sound?(url, sound_name)
+  regexp_escaped = sound_name.gsub(/(\/|\.)/, '\\\\\1')
+  puts "#{url} #{sound_name} #{url =~ /^http:\/\/[0-9.]+\/kcs\/#{regexp_escaped}/}"
+  url =~ /^http:\/\/[0-9.]+\/kcs\/#{regexp_escaped}/
+end
+
 request_callback = proc { |req, res|
   if not config["swf"].nil?
     config["swf"].each do |swf_name, replacement|
@@ -46,6 +52,26 @@ request_callback = proc { |req, res|
         elsif tank.has_the_same_swf?(swf_name, version, replacement)
           res.body = tank.get_cached_raw_data(swf_name)
           res['ETag'] = tank.get_swf_entity_tag(swf_name)
+          res['Expires'] = Time.now.strftime('%a, %d %b %Y %T %z') # RFC 1123
+          raise WEBrick::HTTPStatus::OK
+        end
+      end
+    end
+  end
+  if not config["sound"].nil?
+    config["sound"].each do |sound_name, replacement|
+      if hit_sound?(req.request_uri.to_s, sound_name)
+        if not req['If-None-Match'].nil?
+          if_none_match = req['If-None-Match']
+        elsif not req['If-Range'].nil?
+          if_none_match = req['If-Range']
+        end
+        if (not if_none_match.nil?) and if_none_match == tank.get_raw_data_entity_tag(sound_name)
+          raise WEBrick::HTTPStatus::NotModified
+        else
+          res.body = tank.get_raw_data(replacement)
+          tank.save_list
+          res['ETag'] = tank.get_raw_data_entity_tag(sound_name)
           res['Expires'] = Time.now.strftime('%a, %d %b %Y %T %z') # RFC 1123
           raise WEBrick::HTTPStatus::OK
         end

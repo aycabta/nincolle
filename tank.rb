@@ -124,6 +124,16 @@ class Tank
     end
   end
 
+  def get_raw_data_entity_tag(name)
+    file_data = @list[name]
+    if file_data.nil?
+      "KAGA-SAN-TO-KEKKON-KAKKO-KARI-#{Digest::MD5.hexdigest(name)}"
+    else
+      s = File::stat("cache/#{file_data[:filename]}")
+      "#{Digest::MD5.hexdigest(name)}-#{Digest::MD5.hexdigest(file_data.to_s)}-#{s.size}-#{Digest::MD5.hexdigest(s.mtime.to_s)}"
+    end
+  end
+
   def get_cached_raw_data(name)
     file_data = @list[name]
     f = File.open("cache/#{file_data[:filename]}", "r")

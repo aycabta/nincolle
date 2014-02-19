@@ -4,5 +4,6 @@
     "KanColle_BGM1.mp3": "kuso.mp3"
   "ships/1.swf":
     5: "gohho.jpg"
-
+"sound":
+  "sound/kc119/4.mp3": "ohmy.mp3"
 
