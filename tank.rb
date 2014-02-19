@@ -71,6 +71,7 @@ class Tank
     res = http.request(req)
     if res.nil?
       puts "error: #{url}"
+      nil
     elsif res.kind_of?(Net::HTTPSuccess)
       last_modified = DateTime.rfc2822(res['Last-Modified'])
       etag = res['ETag']
